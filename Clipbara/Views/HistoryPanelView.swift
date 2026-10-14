@@ -4,9 +4,6 @@ import SwiftData
 struct HistoryPanelView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.colorScheme) private var colorScheme
-    @Query(sort: \ClipboardItem.copiedAt, order: .reverse)
-    private var items: [ClipboardItem]
-
     var body: some View {
         ZStack {
             VisualEffectBackground(

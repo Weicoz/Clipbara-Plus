@@ -4,8 +4,8 @@ import Foundation
 struct ThumbnailImageCache {
     private nonisolated(unsafe) static let cache: NSCache<NSString, NSImage> = {
         let cache = NSCache<NSString, NSImage>()
-        cache.countLimit = 180
-        cache.totalCostLimit = 48 * 1024 * 1024
+        cache.countLimit = 64
+        cache.totalCostLimit = 8 * 1024 * 1024
         return cache
     }()
 
@@ -16,8 +16,10 @@ struct ThumbnailImageCache {
         }
 
         let data = item.thumbnailData ?? item.rawData
-        guard let image = NSImage(data: data) else { return nil }
-        cache.setObject(image, forKey: cacheKey, cost: data.count)
+        guard let bitmap = ImageThumbnail.image(from: data) else { return nil }
+        let image = NSImage(cgImage: bitmap, size: .zero)
+        // Compressed file size understates the decoded bitmap's memory cost.
+        cache.setObject(image, forKey: cacheKey, cost: bitmap.bytesPerRow * bitmap.height)
         return image
     }
 }

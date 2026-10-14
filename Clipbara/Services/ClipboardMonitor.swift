@@ -76,13 +76,22 @@ final class ClipboardMonitor {
 
         guard let content = classifier.classify(pasteboard) else { return }
 
+        record(content)
+    }
+
+    func record(_ content: ContentTypeClassifier.ClassifiedContent) {
+        guard let modelContext else { return }
+
         let hash = SHA256.hash(data: content.rawData)
             .compactMap { String(format: "%02x", $0) }
             .joined()
 
-        // Duplicate check within last 10 seconds
-        if let recent = recentDuplicate(hash: hash) {
-            onCapture?(recent)
+        // Reuse history across all dates without losing titles or pinboard entries.
+        if let existing = duplicate(hash: hash, contentType: content.contentType) {
+            existing.copiedAt = Date()
+            try? modelContext.save()
+            refreshLatestItems()
+            onCapture?(existing)
             return
         }
 
@@ -98,11 +107,11 @@ final class ClipboardMonitor {
 
         // Generate thumbnail for images
         if content.contentType == .image {
-            item.thumbnailData = generateThumbnail(from: content.rawData)
+            item.thumbnailData = ImageThumbnail.png(from: content.rawData)
         }
 
-        modelContext?.insert(item)
-        try? modelContext?.save()
+        modelContext.insert(item)
+        try? modelContext.save()
         cleanupOldItems()
         refreshLatestItems()
         onCapture?(item)
@@ -144,35 +153,18 @@ final class ClipboardMonitor {
         try? modelContext.save()
     }
 
-    private func recentDuplicate(hash: String) -> ClipboardItem? {
+    private func duplicate(hash: String, contentType: ContentType) -> ClipboardItem? {
         guard let modelContext else { return nil }
-        let tenSecondsAgo = Date().addingTimeInterval(-10)
+        let type = contentType.rawValue
         let predicate = #Predicate<ClipboardItem> { item in
-            item.contentHash == hash && item.copiedAt > tenSecondsAgo
+            item.contentHash == hash && item.contentTypeRaw == type
         }
-        var descriptor = FetchDescriptor<ClipboardItem>(predicate: predicate)
+        var descriptor = FetchDescriptor<ClipboardItem>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\.copiedAt, order: .reverse)]
+        )
         descriptor.fetchLimit = 1
         return try? modelContext.fetch(descriptor).first
-    }
-
-    private func generateThumbnail(from data: Data) -> Data? {
-        guard let image = NSImage(data: data) else { return nil }
-        let maxSize: CGFloat = 320
-        let size = image.size
-        let scale = min(maxSize / size.width, maxSize / size.height, 1.0)
-        let newSize = NSSize(width: size.width * scale, height: size.height * scale)
-
-        let thumbnail = NSImage(size: newSize)
-        thumbnail.lockFocus()
-        image.draw(in: NSRect(origin: .zero, size: newSize))
-        thumbnail.unlockFocus()
-
-        guard let tiffData = thumbnail.tiffRepresentation,
-              let bitmap = NSBitmapImageRep(data: tiffData),
-              let pngData = bitmap.representation(using: .png, properties: [:]) else {
-            return nil
-        }
-        return pngData
     }
 
     func skipNextChange() {

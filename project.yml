@@ -226,6 +226,11 @@ targets:
       - path: Shared/Models/PinboardEntry.swift
       - path: Shared/Models/ContentType.swift
       - path: Shared/Models/ImageFingerprint.swift
+      - path: Clipbara/Models/ExcludedApp.swift
+      - path: Clipbara/Services/ContentTypeClassifier.swift
+      - path: Clipbara/Services/ClipboardMonitor.swift
+      - path: Clipbara/Utilities/ImageThumbnail.swift
+      - path: Clipbara/Utilities/ThumbnailImageCache.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.minsang.ClipbaraTests
