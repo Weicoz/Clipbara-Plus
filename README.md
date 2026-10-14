@@ -1,3 +1,5 @@
+> 本仓库是 Weicoz 的定制 fork。优化内容、上游同步与更新边界见 [中文说明](README.zh-CN.md#定制-fork)。
+
 <p align="center">
   <img src="Clipbara/Resources/Assets.xcassets/AppIcon.appiconset/256.png" width="128" height="128" alt="Clipbara icon">
 </p>

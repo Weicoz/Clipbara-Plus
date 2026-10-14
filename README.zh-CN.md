@@ -1,3 +1,24 @@
+## 定制 fork
+
+本仓库由 Weicoz 维护，上游为 [mobrava/Clipbara](https://github.com/mobrava/Clipbara)。保留 GPL-3.0 许可。
+
+- 全历史精确去重：类型与原始数据相同才复用记录。重复复制时置顶，保留标题、收藏和钉板关系。旧重复记录不自动删除。
+- 图片缩略图在解码时缩小至最长边 320 像素，保留原始图片。旧记录缺少缩略图时也限制预览解码尺寸。
+- 图片缓存按解码后的位图大小计费，预算 8 MiB、最多 64 项。NSCache 预算不代表整个 App 的内存上限。
+- 移除历史面板中未使用的全历史查询。未更改历史容量设置或存储结构。
+
+同步上游时执行 `git fetch upstream`，再执行 `git merge upstream/main`。解决冲突后，重新生成项目、运行测试和构建，再推送自己的 `main`；不得用强制覆盖丢掉定制提交。
+
+```sh
+xcodegen generate
+xcodebuild -project Clipbara.xcodeproj -scheme ClipbaraTests -configuration Debug -destination 'platform=macOS' -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO test
+xcodebuild -project Clipbara.xcodeproj -scheme Clipbara -configuration Release CODE_SIGNING_ALLOWED=NO build
+```
+
+应用内 Sparkle 更新仍指向上游发行版。定制版从本 fork 合并源码并重新构建更新；使用应用内更新会覆盖定制功能。上述构建不含发行签名，安装前按项目发布流程签名，并备份现有历史。
+
+以下为上游项目说明。
+
 <p align="center">
   <img src="Clipbara/Resources/Assets.xcassets/AppIcon.appiconset/256.png" width="128" height="128" alt="Clipbara 图标">
 </p>
