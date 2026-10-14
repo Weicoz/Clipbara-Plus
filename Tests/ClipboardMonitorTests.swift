@@ -8,6 +8,7 @@ final class ClipboardMonitorTests: XCTestCase {
     private var context: ModelContext { container.mainContext }
 
     override func setUp() async throws {
+        UserDefaults.standard.removeObject(forKey: PlusSettings.deduplicationKey)
         container = try ModelContainer(
             for: ClipboardItem.self, Pinboard.self, PinboardEntry.self, ExcludedApp.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
@@ -15,6 +16,10 @@ final class ClipboardMonitorTests: XCTestCase {
         monitor = ClipboardMonitor()
         monitor.start(modelContext: context)
         monitor.stop() // Exercise capture without polling or writing the user's clipboard.
+    }
+
+    override func tearDown() async throws {
+        UserDefaults.standard.removeObject(forKey: PlusSettings.deduplicationKey)
     }
 
     private func record(_ text: String, type: ContentType = .plainText) {
@@ -68,5 +73,18 @@ final class ClipboardMonitorTests: XCTestCase {
         record("other encoding", type: .image)
         XCTAssertEqual(try items().count, 2)
         XCTAssertTrue(try items().contains { $0.id == original.id })
+    }
+
+    func testDeduplicationCanBeDisabledAndEnabledWithoutRestart() throws {
+        record("same")
+        UserDefaults.standard.set(false, forKey: PlusSettings.deduplicationKey)
+        record("same")
+        XCTAssertEqual(try items().count, 2)
+
+        UserDefaults.standard.set(true, forKey: PlusSettings.deduplicationKey)
+        let newestID = try XCTUnwrap(items().first?.id)
+        record("same")
+        XCTAssertEqual(try items().count, 2)
+        XCTAssertEqual(try items().first?.id, newestID)
     }
 }

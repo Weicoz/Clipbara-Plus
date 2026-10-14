@@ -10,6 +10,8 @@ permissions:
 
 jobs:
   release:
+    # 定制版由本机验签后发布，避免上游流水线覆盖产物。
+    if: github.repository == 'mobrava/Clipbara'
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4

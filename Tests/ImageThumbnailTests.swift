@@ -3,7 +3,15 @@ import ImageIO
 import UniformTypeIdentifiers
 import XCTest
 
+@MainActor
 final class ImageThumbnailTests: XCTestCase {
+    override func setUp() async throws {
+        UserDefaults.standard.removeObject(forKey: PlusSettings.lowMemoryImagesKey)
+    }
+
+    override func tearDown() async throws {
+        UserDefaults.standard.removeObject(forKey: PlusSettings.lowMemoryImagesKey)
+    }
     private func picture(width: Int, height: Int) throws -> Data {
         let bitmap = try XCTUnwrap(CGContext(data: nil, width: width, height: height,
             bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
@@ -46,5 +54,23 @@ final class ImageThumbnailTests: XCTestCase {
         XCTAssertEqual(small.height, 16)
         XCTAssertNil(ImageThumbnail.image(from: Data("invalid".utf8)))
         XCTAssertNil(ImageThumbnail.png(from: Data()))
+    }
+
+    func testSwitchingMemoryModeReplacesCachedImageWithoutChangingOriginal() throws {
+        let data = try picture(width: 1024, height: 512)
+        let item = ClipboardItem(contentType: .image, rawData: data, contentHash: "switch")
+        let small = try XCTUnwrap(ThumbnailImageCache.image(for: item))
+        XCTAssertEqual(small.cgImage(forProposedRect: nil, context: nil, hints: nil)?.width, 320)
+
+        UserDefaults.standard.set(false, forKey: PlusSettings.lowMemoryImagesKey)
+        let full = try XCTUnwrap(ThumbnailImageCache.image(for: item))
+        XCTAssertEqual(full.cgImage(forProposedRect: nil, context: nil, hints: nil)?.width, 1024)
+        XCTAssertFalse(small === full)
+        XCTAssertNotNil(ImageThumbnail.png(from: data, lowMemory: false))
+
+        UserDefaults.standard.set(true, forKey: PlusSettings.lowMemoryImagesKey)
+        let smallAgain = try XCTUnwrap(ThumbnailImageCache.image(for: item))
+        XCTAssertEqual(smallAgain.cgImage(forProposedRect: nil, context: nil, hints: nil)?.width, 320)
+        XCTAssertEqual(item.rawData, data)
     }
 }

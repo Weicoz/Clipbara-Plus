@@ -231,6 +231,7 @@ targets:
       - path: Clipbara/Services/ClipboardMonitor.swift
       - path: Clipbara/Utilities/ImageThumbnail.swift
       - path: Clipbara/Utilities/ThumbnailImageCache.swift
+      - path: Clipbara/Utilities/PlusSettings.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.minsang.ClipbaraTests

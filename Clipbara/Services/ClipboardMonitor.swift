@@ -87,7 +87,8 @@ final class ClipboardMonitor {
             .joined()
 
         // Reuse history across all dates without losing titles or pinboard entries.
-        if let existing = duplicate(hash: hash, contentType: content.contentType) {
+        if PlusSettings.automaticDeduplication,
+           let existing = duplicate(hash: hash, contentType: content.contentType) {
             existing.copiedAt = Date()
             try? modelContext.save()
             refreshLatestItems()
@@ -107,7 +108,7 @@ final class ClipboardMonitor {
 
         // Generate thumbnail for images
         if content.contentType == .image {
-            item.thumbnailData = ImageThumbnail.png(from: content.rawData)
+            item.thumbnailData = ImageThumbnail.png(from: content.rawData, lowMemory: PlusSettings.lowMemoryImages)
         }
 
         modelContext.insert(item)

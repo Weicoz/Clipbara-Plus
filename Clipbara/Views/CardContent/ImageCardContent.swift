@@ -4,6 +4,7 @@ import AppKit
 struct ImageCardContent: View {
     let item: ClipboardItem
     @State private var cachedImage: NSImage?
+    @AppStorage(PlusSettings.lowMemoryImagesKey) private var lowMemoryImages = true
 
     var body: some View {
         Group {
@@ -21,7 +22,7 @@ struct ImageCardContent: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .task(id: item.id) {
+        .task(id: "\(item.id)-\(lowMemoryImages)") {
             cachedImage = ThumbnailImageCache.image(for: item)
         }
     }

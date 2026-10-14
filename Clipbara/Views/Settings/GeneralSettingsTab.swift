@@ -8,6 +8,8 @@ struct GeneralSettingsTab: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AppState.self) private var appState
     @AppStorage("historyLimit") private var historyLimit: Int = 500
+    @AppStorage(PlusSettings.deduplicationKey) private var automaticDeduplication = true
+    @AppStorage(PlusSettings.lowMemoryImagesKey) private var lowMemoryImages = true
     @AppStorage(PasteService.alwaysPlainTextDefaultsKey) private var alwaysPastePlainText: Bool = false
     @AppStorage(DirectPaste.enabledDefaultsKey) private var pasteIntoActiveApp: Bool = false
     @State private var hasPastePermission = DirectPaste.hasPermission
@@ -71,6 +73,18 @@ struct GeneralSettingsTab: View {
                 Button("Quit Clipbara") {
                     NSApplication.shared.terminate(nil)
                 }
+            }
+
+            Section("Plus") {
+                Toggle("自动去重（全历史）", isOn: $automaticDeduplication)
+                Text("相同类型、相同原始数据只保留一条记录，并移到顶部。关闭后，重复复制会新增记录；已整理的历史不会恢复。")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+
+                Toggle("低内存图片预览", isOn: $lowMemoryImages)
+                Text("开启时限制预览解码尺寸，并使用 8 MiB 图片缓存预算。关闭后恢复原版图片处理，内存占用会增加。原始图片始终保留。")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
             }
 
             Section("Pasting") {
