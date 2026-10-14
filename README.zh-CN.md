@@ -1,6 +1,8 @@
-## 定制 fork
+## Clipbara Plus
 
-本仓库由 Weicoz 维护，上游为 [mobrava/Clipbara](https://github.com/mobrava/Clipbara)。保留 GPL-3.0 许可。
+Clipbara Plus 是 Clipbara 的定制 fork，上游为 [mobrava/Clipbara](https://github.com/mobrava/Clipbara)。保留 GPL-3.0 许可。
+
+macOS 自编译版名称为 `Clipbara Plus.app`，本地项目目录为 `Clipbara-Plus`。Xcode 工程与 scheme 保留上游名称，便于同步。Bundle ID 和历史存储路径保持兼容；原版与定制版共用历史，不同时运行。
 
 - 全历史精确去重：类型与原始数据相同才复用记录。重复复制时置顶，保留标题、收藏和钉板关系。旧重复记录不自动删除。
 - 图片缩略图在解码时缩小至最长边 320 像素，保留原始图片。旧记录缺少缩略图时也限制预览解码尺寸。

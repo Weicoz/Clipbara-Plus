@@ -19,7 +19,7 @@ struct AboutTab: View {
                 .font(.system(size: 64))
                 .foregroundStyle(.tint)
 
-            Text(verbatim: "Clipbara")
+            Text(verbatim: Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "Clipbara")
                 .font(.title.bold())
 
             Text("Version \(appVersion) (\(buildNumber))")

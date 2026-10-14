@@ -37,7 +37,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.minsang.PasteClip
-        PRODUCT_NAME: Clipbara
+        PRODUCT_NAME: Clipbara Plus
         INFOPLIST_FILE: Clipbara/Info.plist
         CODE_SIGN_ENTITLEMENTS: Clipbara/Clipbara.entitlements
         GENERATE_INFOPLIST_FILE: false

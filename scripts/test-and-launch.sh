@@ -41,11 +41,11 @@ xcodebuild \
   build
 
 echo "==> Quitting the running app and launching the new build..."
-APP="$OUTPUT/DerivedData/Build/Products/Debug/Clipbara.app"
+APP="$OUTPUT/DerivedData/Build/Products/Debug/Clipbara Plus.app"
 test -d "$APP"
-pkill -f 'Clipbara.app/Contents/MacOS/Clipbara' || true
+pkill -f 'Clipbara( Plus)?\.app/Contents/MacOS/Clipbara( Plus)?$' || true
 sleep 2
-if pgrep -f 'Clipbara.app/Contents/MacOS/Clipbara' >/dev/null; then
+if pgrep -f 'Clipbara( Plus)?\.app/Contents/MacOS/Clipbara( Plus)?$' >/dev/null; then
   echo "    FATAL: the previous instance is still running. Quit Clipbara and run this again."
   echo "    A second instance would register the global shortcut twice."
   exit 1

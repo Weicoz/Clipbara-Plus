@@ -14,7 +14,7 @@ SIGN_IDENTITY="${SIGN_IDENTITY:--}"
 NOTARY_PROFILE="${NOTARY_PROFILE:-pasteclip-notary}"
 # -----------------------------------------------------------------------------
 
-APP_NAME="Clipbara"
+APP_NAME="Clipbara Plus"
 SCHEME="Clipbara"
 PROJECT="Clipbara.xcodeproj"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
